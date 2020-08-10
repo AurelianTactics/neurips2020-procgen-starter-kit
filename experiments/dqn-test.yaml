@@ -17,7 +17,7 @@ procgen-starter-example:
     ################################################
     stop:
         timesteps_total: 8000000
-		time_total_s: 7200
+        time_total_s: 7200
   
     ################################################
     # === Settings for Checkpoints ===
@@ -49,17 +49,17 @@ procgen-starter-example:
             use_sequential_levels: False
             # What variant of the levels to use, the options are "easy", "hard", "extreme", "memory", "exploration". All games support "easy" and "hard", while other options are game-specific. The default is "hard". Switching to "easy" will reduce the number of timesteps required to solve each game and is useful for testing or when working with limited compute resources. NOTE : During the evaluation phase (rollout), this will always be overriden to "easy"
             distribution_mode: easy
-			use_backgrounds: True
-			restrict_themes: False
-			use_monochrome_assets: False
+            use_backgrounds: True
+            restrict_themes: False
+            use_monochrome_assets: False
 
         ################################################
         ################################################
         # === Environment Settings ===
         ################################################
         ################################################
-		# copied over from example: https://github.com/ray-project/ray/blob/master/rllib/tuned_examples/dqn/pong-rainbow.yaml
-		num_atoms: 51
+        # copied over from example: https://github.com/ray-project/ray/blob/master/rllib/tuned_examples/dqn/pong-rainbow.yaml
+        num_atoms: 51
         noisy: True
         gamma: 0.99
         lr: .0001
@@ -83,7 +83,7 @@ procgen-starter-example:
           zero_mean: False
           dim: 42
 
-		#starter kit default settings
+        #starter kit default settings
         # Discount factor of the MDP.
         #gamma: 0.99
         # The default learning rate.
@@ -136,7 +136,7 @@ procgen-starter-example:
         # === Settings for Rollout Worker processes ===
         ################################################
         ################################################
-		#me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
+        #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of rollout worker actors to create for parallel sampling. Setting
         # this to 0 will force rollouts to be done in the trainer actor.
         num_workers: 3
@@ -174,7 +174,7 @@ procgen-starter-example:
         # === Advanced Resource Settings ===
         ################################################
         ################################################
-		#me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
+        #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of CPUs to allocate per worker.
         num_cpus_per_worker: 1
         # Number of GPUs to allocate per worker. This can be fractional. This is
@@ -190,7 +190,7 @@ procgen-starter-example:
         # === Settings for the Trainer process ===
         ################################################
         ################################################
-		#me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
+        #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of GPUs to allocate to the trainer process. Note that not all
         # algorithms can take advantage of trainer GPUs. This can be fractional
         # (e.g., 0.3 GPUs).
@@ -239,12 +239,12 @@ procgen-starter-example:
         # results. This makes experiments reproducible.
         #seed: null
 
-		# Evaluation settings per organizer instructions
-		# We use this to generate the videos during training
-		evaluation_interval: 25
-		evaluation_num_workers: 1
-		evaluation_num_episodes: 3
-		evaluation_config:
-		  num_envs_per_worker: 1
-		  env_config:
-			render_mode: rgb_array
+        # Evaluation settings per organizer instructions
+        # We use this to generate the videos during training
+        evaluation_interval: 25
+        evaluation_num_workers: 1
+        evaluation_num_episodes: 3
+        evaluation_config:
+            num_envs_per_worker: 1
+            env_config:
+                render_mode: rgb_array
