@@ -87,7 +87,6 @@ procgen-starter-example:
         final_prioritized_replay_beta: 1.0
         prioritized_replay_beta_annealing_timesteps: 200000
         n_step: 3
-        gpu: True
         #adam_epsilon: .00015
         model:
           grayscale: True
