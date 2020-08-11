@@ -76,11 +76,11 @@ procgen-starter-example:
         #rollout_fragment_length: 20 #below
         train_batch_size: 32
         exploration_config:
-            type: PerWorkerEpsilonGreedy
-            #type: EpsilonGreedy
-        #    epsilon_timesteps: 100000
-        #    initial_epsilon: 1.0
-        #    final_epsilon: 0.02
+            #type: PerWorkerEpsilonGreedy
+            type: EpsilonGreedy
+            epsilon_timesteps: 1000000
+            initial_epsilon: 1.0
+            final_epsilon: 0.01
         target_network_update_freq: 40000 #apparently no soft target network updating?
         prioritized_replay: True
         prioritized_replay_alpha: 0.5
