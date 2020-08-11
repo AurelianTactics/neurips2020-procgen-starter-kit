@@ -5,7 +5,7 @@ set -e
 # Your experiment file for submission   #
 #########################################
 
-export EXPERIMENT_DEFAULT="experiments/apex-test.yaml"
+export EXPERIMENT_DEFAULT="experiments/ppo-submission-1.yaml"
 export EXPERIMENT=${EXPERIMENT:-$EXPERIMENT_DEFAULT}
 
 if [[ -z $AICROWD_IS_GRADING ]]; then

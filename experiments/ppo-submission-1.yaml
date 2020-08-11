@@ -1,13 +1,13 @@
-procgen-starter-example:
+procgen-ppo:
     env: procgen_env_wrapper  # Change this at your own risk :D
-    run: APEX
-    # Can be replaced by any of the available agents as described at :
+    run: PPO
+    # Can be replaced by any of the available agents as described at : 
     # https://github.com/ray-project/ray/blob/master/rllib/agents/registry.py#L103
-    #
+    # 
     # Internally, rllib uses the terminology of Trainable, Algorithms, Agents depending
     # on the context in which it is used. In this repository, we will consistently
     # use the terminology of "Algorithms" to refer to these Trainables/Agents.
-    #
+    # 
     # This can also be replaced by a custom "algorithm"
     # For addition of custom algorithms,
     # Please refer to :
@@ -18,11 +18,11 @@ procgen-starter-example:
     stop:
         timesteps_total: 8000000
         time_total_s: 7200
-  
+
     ################################################
     # === Settings for Checkpoints ===
     ################################################
-    checkpoint_freq: 1
+    checkpoint_freq: 100
     checkpoint_at_end: True
     keep_checkpoints_num: 5
 
@@ -58,48 +58,54 @@ procgen-starter-example:
         # === Environment Settings ===
         ################################################
         ################################################
-        # copied over from example: https://github.com/ray-project/ray/blob/master/rllib/tuned_examples/dqn/atari-apex.yaml
-        num_atoms: 51
-        v_min: 0
-        v_max: 10
-        noisy: False
-        # control the initial value of noisy nets
-        #"sigma0": 0.5,
-        double_q: True
-        dueling: True
-        gamma: 0.99
-        lr: .0001
-        adam_epsilon: .00015
-        hiddens: [512]
-        learning_starts: 10000
-        buffer_size: 1000000
-        #rollout_fragment_length: 20 #below
-        train_batch_size: 32
-        exploration_config:
-            type: PerWorkerEpsilonGreedy
-            #type: EpsilonGreedy
-        #    epsilon_timesteps: 100000
-        #    initial_epsilon: 1.0
-        #    final_epsilon: 0.02
-        target_network_update_freq: 40000 #apparently no soft target network updating?
-        prioritized_replay: True
-        prioritized_replay_alpha: 0.5
-        final_prioritized_replay_beta: 1.0
-        prioritized_replay_beta_annealing_timesteps: 200000
-        n_step: 3
-        gpu: True
-        #adam_epsilon: .00015
-        model:
-          grayscale: True
-          zero_mean: False
-          dim: 42
-
-        # APEX
-        #num_workers: 8
-        #num_envs_per_worker: 8
-        rollout_fragment_length: 20 #only 20 in the config
-        train_batch_size: 512
-        timesteps_per_iteration: 1000 #25000 in config but only given 8m timesteps here
+        # Discount factor of the MDP.
+        gamma: 0.999
+        # The GAE(lambda) parameter.
+        lambda: 0.95
+        # The default learning rate.
+        lr: 5.0e-4
+        # Number of SGD iterations in each outer loop (i.e., number of epochs to
+        # execute per train batch).
+        num_sgd_iter: 3
+        # Total SGD batch size across all devices for SGD. This defines the
+        # minibatch size within each epoch.
+        sgd_minibatch_size: 2048 # 8 minibatches per epoch
+        # Training batch size, if applicable. Should be >= rollout_fragment_length.
+        # Samples batches will be concatenated together to a batch of this size,
+        # which is then passed to SGD.
+        train_batch_size: 16384 # 256 * 64
+        # Initial coefficient for KL divergence.
+        kl_coeff: 0.0
+        # Target value for KL divergence.
+        kl_target: 0.01
+        # Coefficient of the value function loss. IMPORTANT: you must tune this if
+        # you set vf_share_layers: True.
+        vf_loss_coeff: 0.5
+        # Coefficient of the entropy regularizer.
+        entropy_coeff: 0.01
+        # PPO clip parameter.
+        clip_param: 0.2
+        # Clip param for the value function. Note that this is sensitive to the
+        # scale of the rewards. If your expected V is large, increase this.
+        vf_clip_param: 0.2
+        # If specified, clip the global norm of gradients by this amount.
+        grad_clip: 0.5
+        # Which observation filter to apply to the observation.
+        observation_filter: NoFilter
+        # Share layers for value function. If you set this to True, it's important
+        # to tune vf_loss_coeff.
+        vf_share_layers: True
+        # Number of steps after which the episode is forced to terminate. Defaults
+        # to `env.spec.max_episode_steps` (if present) for Gym envs.
+        horizon: null
+        # Calculate rewards but don't reset the environment when the horizon is
+        # hit. This allows value estimation and RNN state to span across logical
+        # episodes denoted by horizon. This only has an effect if horizon != inf.
+        soft_horizon: False
+        # Don't set 'done' at the end of the episode. Note that you still need to
+        # set this if soft_horizon=True, unless your env is actually running
+        # forever without returning done=True.
+        no_done_at_end: False
 
         # Unsquash actions to the upper and lower bounds of env's action space
         normalize_actions: False
@@ -110,41 +116,6 @@ procgen-starter-example:
         clip_actions: True
         # Whether to use rllib or deepmind preprocessors by default
         preprocessor_pref: deepmind
-        # Whether to attempt to continue training if a worker crashes. The number
-        # of currently healthy workers is reported as the "num_healthy_workers"
-        # metric.
-        ignore_worker_failures: False
-        # Log system resource metrics to results. This requires `psutil` to be
-        # installed for sys stats, and `gputil` for GPU metrics.
-        # Note : The AIcrowd Evaluators will always override this to be True
-        log_sys_usage: True
-
-        #starter kit default settings
-        # Discount factor of the MDP.
-        #gamma: 0.99
-        # The default learning rate.
-        #lr: 0.0001
-        # Number of steps after which the episode is forced to terminate. Defaults
-        # to `env.spec.max_episode_steps` (if present) for Gym envs.
-        #horizon: null
-        # Calculate rewards but don't reset the environment when the horizon is
-        # hit. This allows value estimation and RNN state to span across logical
-        # episodes denoted by horizon. This only has an effect if horizon != inf.
-        #soft_horizon: False
-        # Don't set 'done' at the end of the episode. Note that you still need to
-        # set this if soft_horizon=True, unless your env is actually running
-        # forever without returning done=True.
-        #no_done_at_end: False
-
-        # Unsquash actions to the upper and lower bounds of env's action space
-        #normalize_actions: False
-        # Whether to clip rewards prior to experience postprocessing. Setting to
-        # None means clip for Atari only.
-        #clip_rewards: null
-        # Whether to np.clip() actions to the action space low/high range spec.
-        #clip_actions: True
-        # Whether to use rllib or deepmind preprocessors by default
-        #preprocessor_pref: deepmind
 
         # Whether to attempt to continue training if a worker crashes. The number
         # of currently healthy workers is reported as the "num_healthy_workers"
@@ -166,14 +137,69 @@ procgen-starter-example:
         ################################################
         ################################################
         model:
+            # These options are used when not using a custom model, to use a default model,
+            # comment out the `custom_model` field and then un-comment the below model options.
+
+            # === Built-in options ===
+            # More information on built in Models are available here :
+            # https://ray.readthedocs.io/en/stable/rllib-models.html#built-in-models-and-preprocessors
+            #
+            # Filter config. List of [out_channels, kernel, stride] for each filter
+            # conv_filters: null
+            # Nonlinearity for built-in convnet
+            # conv_activation: relu
+            # Nonlinearity for fully connected net (tanh, relu)
+            # fcnet_activation: tanh
+            # Number of hidden layers for fully connected net
+            # fcnet_hiddens: [256, 256]
+            # Whether to skip the final linear layer used to resize the hidden layer
+            # outputs to size `num_outputs`. If True, then the last hidden layer
+            # should already match num_outputs.
+            # no_final_linear: false
+            # Whether layers should be shared for the value function
+            # vf_share_layers: true
+
+            # == LSTM ==
+            # Whether to wrap the model with a LSTM
+            # use_lstm: false
+            # Max seq len for training the LSTM, defaults to 20
+            # max_seq_len: 20
+            # Size of the LSTM cell
+            # lstm_cell_size: 256
+            # Whether to feed a_{t-1}, r_{t-1} to LSTM
+            # lstm_use_prev_action_reward: false
+            # When using modelv1 models with a modelv2 algorithm, you may have to
+            # define the state shape here (e.g., [256, 256]).
+            # state_shape: null
+
+            # === Options for custom models ===
+            # Name of a custom model to use
+            #
+            # Custom Models can be implemented in the models/ folder.
+            # Please refer to :
+            #   https://github.com/AIcrowd/neurips2020-procgen-starter-kit/blob/master/models/my_vision_network.py
+            #  for an example.
+            #
+            # RLlib documentation on implementing custom Models is available
+            # here :
+            # https://ray.readthedocs.io/en/stable/rllib-models.html#custom-models-tensorflow
+            #
+            # Participants can also choose to implement their models
+            # in PyTorch. Here is an example to implement a PyTorch based model :
+            # https://github.com/ray-project/ray/blob/master/rllib/examples/custom_torch_policy.py
+            #
+            # Examples of implementing the model in Keras is also available
+            # here :
+            # https://github.com/ray-project/ray/blob/master/rllib/examples/custom_keras_model.py
             custom_model: impala_cnn_tf
+            # Extra options to pass to custom class
+            custom_options: {}
 
         ################################################
         ################################################
         # === Settings for Rollout Worker processes ===
         ################################################
         ################################################
-        #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of rollout worker actors to create for parallel sampling. Setting
         # this to 0 will force rollouts to be done in the trainer actor.
         num_workers: 6
@@ -198,14 +224,14 @@ procgen-starter-example:
         #
         # The dataflow here can vary per algorithm. For example, PPO further
         # divides the train batch into minibatches for multi-epoch SGD.
-        #rollout_fragment_length: 200 #up above
+        rollout_fragment_length: 256
 
         # Whether to rollout "complete_episodes" or "truncate_episodes" to
-        # `rollout_fragment_length` length unrolls. Episode truncation guarantees 
+        # `rollout_fragment_length` length unrolls. Episode truncation guarantees
         # evenly sized batches, but increases variance as the reward-to-go will
         # need to be estimated at truncation boundaries.
         batch_mode: truncate_episodes
-        
+
         ################################################
         ################################################
         # === Advanced Resource Settings ===
@@ -220,23 +246,18 @@ procgen-starter-example:
         num_gpus_per_worker: 0.05
         # Number of CPUs to allocate for the trainer. Note: this only takes effect
         # when running in Tune. Otherwise, the trainer runs in the main program.
-        num_cpus_for_driver: 1        
+        num_cpus_for_driver: 1    
 
         ################################################
         ################################################
         # === Settings for the Trainer process ===
         ################################################
         ################################################
-        #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of GPUs to allocate to the trainer process. Note that not all
         # algorithms can take advantage of trainer GPUs. This can be fractional
         # (e.g., 0.3 GPUs).
         # Note : If GPUs are not available, this will be overriden by the AIcrowd evaluators to 0.
         num_gpus: 0.6
-        # Training batch size, if applicable. Should be >= rollout_fragment_length.
-        # Samples batches will be concatenated together to a batch of this size,
-        # which is then passed to SGD.
-        #train_batch_size: 200 #above
 
         ################################################
         ################################################
@@ -246,15 +267,15 @@ procgen-starter-example:
         # Default exploration behavior, iff `explore`=None is passed into
         # compute_action(s).
         # Set to False for no exploration behavior (e.g., for evaluation).
-        # explore: True,
+        explore: True,
         # Provide a dict specifying the Exploration object's config.
-        #exploration_config:
+        exploration_config:
             # The Exploration class to use. In the simplest case, this is the name
             # (str) of any class present in the `rllib.utils.exploration` package.
             # You can also provide the python class directly or the full location
             # of your class (e.g. "ray.rllib.utils.exploration.epsilon_greedy.
             # EpsilonGreedy)
-            # type: "StochasticSampling"
+            type: "StochasticSampling"
             # Can add constructor kwargs here (if any)
 
         ################################################
@@ -263,19 +284,19 @@ procgen-starter-example:
         ################################################
         ################################################
         # Element-wise observation filter, either "NoFilter" or "MeanStdFilter".
-        #observation_filter: "NoFilter"
+        observation_filter: "NoFilter"
         # Whether to synchronize the statistics of remote filters.
-        #synchronize_filters: True
+        synchronize_filters: True
         # Whether to LZ4 compress individual observations
-        #compress_observations: False
+        compress_observations: False
         # Minimum env steps to optimize for per train call. This value does
         # not affect learning, only the length of train iterations.
-        #timesteps_per_iteration: 0
+        timesteps_per_iteration: 0
         # This argument, in conjunction with worker_index, sets the random seed of
         # each worker, so that identically configured trials will have identical
         # results. This makes experiments reproducible.
-        #seed: null
-
+        seed: null
+        
         # Evaluation settings per organizer instructions
         # We use this to generate the videos during training
         evaluation_interval: 25
@@ -285,4 +306,3 @@ procgen-starter-example:
             num_envs_per_worker: 1
             env_config:
                 render_mode: rgb_array
-            explore: False
