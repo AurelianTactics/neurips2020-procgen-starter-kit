@@ -16,7 +16,7 @@ if [[ -z $AICROWD_IS_GRADING ]]; then
   ##########################################################################
 
   export OUTPUTS_DIR=./outputs
-  export RAY_MEMORY_LIMIT=60129542144
+  export RAY_MEMORY_LIMIT=15129542144
   export RAY_CPUS=8
   export RAY_STORE_MEMORY=30000000000
 	

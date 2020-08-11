@@ -70,7 +70,7 @@ procgen-starter-example:
         gamma: 0.99
         lr: .0001
         adam_epsilon: .00015
-        hiddens: [512]
+        hiddens: [256]
         learning_starts: 10000
         buffer_size: 1000000
         #rollout_fragment_length: 20 #below
@@ -97,8 +97,8 @@ procgen-starter-example:
         #num_workers: 8
         #num_envs_per_worker: 8
         rollout_fragment_length: 20 #only 20 in the config
-        train_batch_size: 512
-        timesteps_per_iteration: 1000 #25000 in config but only given 8m timesteps here
+        train_batch_size: 256
+        timesteps_per_iteration: 10000 #25000 in config but only given 8m timesteps here
 
         # Unsquash actions to the upper and lower bounds of env's action space
         normalize_actions: False
@@ -175,12 +175,12 @@ procgen-starter-example:
         #me: i messed around with this a bit based on: https://discourse.aicrowd.com/t/gpu-utilization/3197
         # Number of rollout worker actors to create for parallel sampling. Setting
         # this to 0 will force rollouts to be done in the trainer actor.
-        num_workers: 4
+        num_workers: 3
 
         # Number of environments to evaluate vectorwise per worker. This enables
         # model inference batching, which can improve performance for inference
         # bottlenecked workloads.
-        num_envs_per_worker: 10
+        num_envs_per_worker: 6
 
         # Divide episodes into fragments of this many steps each during rollouts.
         # Sample batches of this size are collected from rollout workers and
@@ -216,7 +216,7 @@ procgen-starter-example:
         # Number of GPUs to allocate per worker. This can be fractional. This is
         # usually needed only if your env itself requires a GPU (i.e., it is a
         # GPU-intensive video game), or model inference is unusually expensive.
-        num_gpus_per_worker: 0.05
+        num_gpus_per_worker: 0.03
         # Number of CPUs to allocate for the trainer. Note: this only takes effect
         # when running in Tune. Otherwise, the trainer runs in the main program.
         num_cpus_for_driver: 1        
