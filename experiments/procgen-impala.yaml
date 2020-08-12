@@ -1,4 +1,4 @@
-procgen-ppo:
+procgen-impala:
     env: procgen_env_wrapper  # Change this at your own risk :D
     run: IMPALA
     # Can be replaced by any of the available agents as described at : 
@@ -60,22 +60,44 @@ procgen-ppo:
         ################################################
         #some IMPALA specific https://docs.ray.io/en/master/rllib-algorithms.html#impala
         vtrace: True
+		        # set >0 to enable experience replay. Saved samples will be replayed with
+        # a p:1 proportion to new data samples.
+        #replay_proportion": 0.0 #set above 0.0 to enable
+        #"replay_buffer_num_slots": 0,
+        # max queue size for train batches feeding into the learner
+        #"learner_queue_size": 16,
+        # wait for train batches to be available in minibatch buffer queue
+        # this many seconds. This may need to be increased e.g. when training
+        # with a slow environment
+        #"learner_queue_timeout": 300,
+        # level of queuing for sampling.
+        #"max_sample_requests_in_flight_per_worker": 2,
+        # max number of workers to broadcast one set of weights to
+        #"broadcast_interval": 1,
+        # use intermediate actors for multi-level aggregation. This can make sense
+        # if ingesting >2GB/s of samples, or if the data requires decompression.
+        #"num_aggregation_workers": 0,
+        # balancing the three losses
+        vf_loss_coeff: 0.5
+        entropy_coeff: 0.01
+        entropy_coeff_schedule: None
         #rollout_fragment_length: 50 #done below
-        train_batch_size: 500
+        #train_batch_size: #500 #done below
         clip_rewards: True
         lr_schedule: None
+
         # Discount factor of the MDP.
-        gamma: 0.995
+        gamma: 0.999
         # The GAE(lambda) parameter.
-        lambda: 0.95
+        #lambda: 0.95
         # The default learning rate.
         lr: 5.0e-4
         # Number of SGD iterations in each outer loop (i.e., number of epochs to
         # execute per train batch).
-        num_sgd_iter: 1 #in IMPALA > 0 allows experience replay?
+        num_sgd_iter: 3
         # Total SGD batch size across all devices for SGD. This defines the
         # minibatch size within each epoch.
-        sgd_minibatch_size: 2048 # 8 minibatches per epoch
+        #sgd_minibatch_size: 2048 # 8 minibatches per epoch #ppo only hyperparam
         # Training batch size, if applicable. Should be >= rollout_fragment_length.
         # Samples batches will be concatenated together to a batch of this size,
         # which is then passed to SGD.
@@ -86,9 +108,9 @@ procgen-ppo:
         #kl_target: 0.01
         # Coefficient of the value function loss. IMPORTANT: you must tune this if
         # you set vf_share_layers: True.
-        vf_loss_coeff: 0.5
+        #vf_loss_coeff: 0.5 #above
         # Coefficient of the entropy regularizer.
-        entropy_coeff: 0.01
+        #entropy_coeff: 0.01 #above
         # PPO clip parameter.
         #clip_param: 0.2
         # Clip param for the value function. Note that this is sensitive to the
@@ -208,12 +230,12 @@ procgen-ppo:
         ################################################
         # Number of rollout worker actors to create for parallel sampling. Setting
         # this to 0 will force rollouts to be done in the trainer actor.
-        num_workers: 3
+        num_workers: 5
 
         # Number of environments to evaluate vectorwise per worker. This enables
         # model inference batching, which can improve performance for inference
         # bottlenecked workloads.
-        num_envs_per_worker: 2
+        num_envs_per_worker: 10
 
         # Divide episodes into fragments of this many steps each during rollouts.
         # Sample batches of this size are collected from rollout workers and
@@ -273,7 +295,7 @@ procgen-ppo:
         # Default exploration behavior, iff `explore`=None is passed into
         # compute_action(s).
         # Set to False for no exploration behavior (e.g., for evaluation).
-        explore: True,
+        explore: True
         # Provide a dict specifying the Exploration object's config.
         exploration_config:
             # The Exploration class to use. In the simplest case, this is the name
