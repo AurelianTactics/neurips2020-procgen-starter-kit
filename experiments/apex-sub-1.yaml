@@ -74,17 +74,18 @@ procgen-starter-example:
         learning_starts: 10000
         buffer_size: 100000
         #rollout_fragment_length: 20 #below
+        train_batch_size: 32
         exploration_config:
             #type: PerWorkerEpsilonGreedy
             type: EpsilonGreedy
-            epsilon_timesteps: 300000
+            epsilon_timesteps: 1000000
             initial_epsilon: 1.0
-            final_epsilon: 0.02
-        target_network_update_freq: 25000 #apparently no soft target network updating?
+            final_epsilon: 0.01
+        target_network_update_freq: 40000 #apparently no soft target network updating?
         prioritized_replay: True
         prioritized_replay_alpha: 0.5
         final_prioritized_replay_beta: 1.0
-        #prioritized_replay_beta_annealing_timesteps: 200000
+        prioritized_replay_beta_annealing_timesteps: 200000
         n_step: 3
         #adam_epsilon: .00015
         model:
@@ -96,8 +97,8 @@ procgen-starter-example:
         #num_workers: 8
         #num_envs_per_worker: 8
         rollout_fragment_length: 20 #only 20 in the config
-        train_batch_size: 32
-        timesteps_per_iteration: 20000 #25000 in config but only given 8m timesteps here
+        train_batch_size: 256
+        timesteps_per_iteration: 10000 #25000 in config but only given 8m timesteps here
 
         # Unsquash actions to the upper and lower bounds of env's action space
         normalize_actions: False
@@ -179,7 +180,7 @@ procgen-starter-example:
         # Number of environments to evaluate vectorwise per worker. This enables
         # model inference batching, which can improve performance for inference
         # bottlenecked workloads.
-        num_envs_per_worker: 8
+        num_envs_per_worker: 6
 
         # Divide episodes into fragments of this many steps each during rollouts.
         # Sample batches of this size are collected from rollout workers and
@@ -202,7 +203,7 @@ procgen-starter-example:
         # `rollout_fragment_length` length unrolls. Episode truncation guarantees 
         # evenly sized batches, but increases variance as the reward-to-go will
         # need to be estimated at truncation boundaries.
-        batch_mode: complete_episodes #truncate_episodes
+        batch_mode: truncate_episodes
         
         ################################################
         ################################################
