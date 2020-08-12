@@ -95,8 +95,8 @@ procgen-starter-example:
         # APEX
         #num_workers: 8
         #num_envs_per_worker: 8
-        rollout_fragment_length: 200 #only 20 in the config
-        train_batch_size: 64
+        rollout_fragment_length: 20 #only 20 in the config
+        train_batch_size: 32
         timesteps_per_iteration: 20000 #25000 in config but only given 8m timesteps here
 
         # Unsquash actions to the upper and lower bounds of env's action space
