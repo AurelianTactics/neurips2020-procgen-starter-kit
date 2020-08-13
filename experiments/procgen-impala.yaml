@@ -60,7 +60,7 @@ procgen-impala:
         ################################################
         #some IMPALA specific https://docs.ray.io/en/master/rllib-algorithms.html#impala
         vtrace: True
-		        # set >0 to enable experience replay. Saved samples will be replayed with
+        # set >0 to enable experience replay. Saved samples will be replayed with
         # a p:1 proportion to new data samples.
         #replay_proportion": 0.0 #set above 0.0 to enable
         #"replay_buffer_num_slots": 0,
