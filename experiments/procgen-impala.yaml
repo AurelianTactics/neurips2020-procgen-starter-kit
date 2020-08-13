@@ -84,7 +84,7 @@ procgen-impala:
         #rollout_fragment_length: 50 #done below
         #train_batch_size: #500 #done below
         clip_rewards: True
-        lr_schedule: None
+        #lr_schedule: #None causes an error? 
 
         # Discount factor of the MDP.
         gamma: 0.999
