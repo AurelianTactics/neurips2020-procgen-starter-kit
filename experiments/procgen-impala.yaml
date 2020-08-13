@@ -80,7 +80,7 @@ procgen-impala:
         # balancing the three losses
         vf_loss_coeff: 0.5
         entropy_coeff: 0.01
-        entropy_coeff_schedule: None
+        #entropy_coeff_schedule: #None causes an error?
         #rollout_fragment_length: 50 #done below
         #train_batch_size: #500 #done below
         clip_rewards: True
